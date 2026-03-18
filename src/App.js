@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { collection, getDocs } from "firebase/firestore";
+import { doc, collection, getDoc, getDocs } from "firebase/firestore";
 import { database } from './config/firebase';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
@@ -142,7 +142,7 @@ function GameState() {
       });
     };
 
-    fetchData('2026-03-10', '2025021014');
+    fetchData('2026-03-10', '2025021015');
   }, []);
 
   return (
@@ -154,14 +154,79 @@ function GameState() {
   );
 }
 
+/**
+ * Attempting to handle all games for a given date.
+ */
+const AllGames = ({ date }) => {
+  const [games, setGames] = useState(null);
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const fetchIds = async () => {
+      try {
+        setGames(null);
+        
+        // Find the document for the provided date.
+        const formattedDate = date.toLocaleDateString('en-ZA').replaceAll("/", "-");
+        const dateRef = doc(database, "Games", formattedDate);
+        const snap = await getDoc(dateRef);
+
+        // If there is a document for the date, continue.
+        if (snap.exists() && snap.data().games) {
+          const ids = snap.data().games;
+
+          // Fetch every game (collection) for the date.
+          const allGames = await Promise.all(
+            ids.map(async (id) => {
+              const gameRef = collection(database, "Games", formattedDate, String(id));
+              const gameSnap = await getDocs(gameRef);
+
+              // Loop through each subdocument and add the associated data.
+              let gameDetails = { id };
+              gameSnap.forEach(doc => {
+                gameDetails[doc.id] = doc.data();
+              });
+
+              return gameDetails;
+            })
+          );
+          setGames(allGames);
+        } 
+        // If not, no games must exist for that date.
+        else {
+          setGames([]);
+        }
+      } catch (err) {
+        console.error("Fetching failure: ", err);
+      }
+    };
+
+    fetchIds();
+  }, [date]);
+
+  if (!games) { return <p style={{color:'white', display:'flex', justifyContent:'center'}}>Loading!</p> }
+  else if (games.length === 0) { return <p style={{color:'white', display:'flex', justifyContent:'center'}}>No games for this date!</p> }
+  return (
+    <div style={{display:'flex', justifyContent:'center'}}>
+      <p style={{color:'white'}}>Games found for this date: {games.length}</p>
+      <ul>
+        {games.map((g, i) => {
+          return <li key={i} style={{color: "white"}}>{g.gameData.teams.home.abbrev} VS. {g.gameData.teams.away.abbrev}</li>
+        })}
+      </ul>
+    </div>
+  )
+}
+
 function App({ pageId }) {
-  const [value, onChange] = useState(new Date(2026, 1, 13));  // using as a testing date.
+  const [value, onChange] = useState(new Date(2026, 2, 10));  // using as a testing date.
   // const [value, onChange] = useState(new Date());
 
   return (
     <div style={{backgroundColor: "black"}}>
       <Calendar onChange={onChange} value={value} />
       <h1 className='dashboard'>{value.toLocaleDateString('en-ZA')} | Games</h1>
+      <AllGames date={value} />
       <GameState />
     </div>
   );
