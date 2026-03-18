@@ -12,18 +12,6 @@ code {
     monospace;
 }
 
-.title {
-  color: white;
-  font-weight: bold;
-  text-align: center;
-}
-
-.flex {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .gameCard {
   background: linear-gradient(180deg,rgba(38, 132, 255, 1) 0%, rgba(23, 79, 153, 1) 100%);
   border: 2px solid #19D3D9;
@@ -78,27 +66,4 @@ code {
 .score {
   font-weight: bold;
   margin: 0;
-}
-
-.logo {
-  width: 70px;          
-  height: auto; 
-  display: block;      
-}
-
-.btn {
-  border-radius: 25px;
-  color: white;
-  font-weight: bold;
-  padding: 4px 12px;
-}
-
-.btn_on {
-  background: linear-gradient(180deg,rgba(38, 132, 255, 1) 0%, rgba(23, 79, 153, 1) 100%);
-  border: 2px solid #19D3D9;
-}
-
-.btn_off {
-  background: linear-gradient(180deg, #899FBC, #3F4855);
-  border: 2px solid #678D8E;
 }

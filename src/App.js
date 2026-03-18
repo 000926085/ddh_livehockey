@@ -16,7 +16,7 @@ function StrengthToggle() {
 
   return (
     <div className='flex'>
-      <h2 className='title'>Strength State:</h2>
+      <h1 className='title'>Strength State:</h1>
 
       {btns.map((b) => {
         return (
@@ -96,25 +96,27 @@ const SelectedGame = ({ game, shots }) => {
     return <div><p>Loading!</p></div>
   }
 
-  console.log(game);
-
   return (
-    <div className='ddh'>
-      <h2 className='gameHeader'><span className='highlight'>P3</span>{game.period.timeRemaining}</h2>
-      <div className='flex'>
-        <div className='flex' style={{flexDirection: 'column'}}>
-          <img className='logo' src={`https://assets.nhle.com/logos/nhl/svg/${game.teams.home.abbrev}_light.svg`} alt="Home Logo" />
-          <h2>{(game.teams.home.name).slice((game.teams.home.name).indexOf(' ')+1)}</h2>
+    <div className='container'>
+      <div className='selectedGame'>
+        <div className='container'>
+          <h2 className='gameHeader'><span className='highlight'>P3</span>{game.period.timeRemaining}</h2>
         </div>
-        
-        <div className='flex' style={{flexDirection: 'column'}}>
-          <h1>{game.teams.home.score} - {game.teams.away.score}</h1>
-          <p style={{ visibility: 'hidden' }}>hidden</p>
-        </div>
+        <div className='container'>
+          <div>
+            <img className='logo' src={`https://assets.nhle.com/logos/nhl/svg/${game.teams.home.abbrev}_light.svg`} alt="Home Logo" />
+            <h2>{(game.teams.home.name).slice((game.teams.home.name).indexOf(' ')+1)}</h2>
+          </div>
+          
+          <div>
+            <h1>{game.teams.home.score} - {game.teams.away.score}</h1>
+            <p style={{ visibility: 'hidden' }}>hidden</p>
+          </div>
 
-        <div className='flex' style={{flexDirection: 'column'}}>
-          <img className='logo' src={`https://assets.nhle.com/logos/nhl/svg/${game.teams.away.abbrev}_light.svg`} alt="Away Logo"/>
-          <h2>{(game.teams.away.name).slice((game.teams.away.name).indexOf(' ')+1)}</h2>
+          <div>
+            <img className='logo' src={`https://assets.nhle.com/logos/nhl/svg/${game.teams.away.abbrev}_light.svg`} alt="Away Logo"/>
+            <h2>{(game.teams.away.name).slice((game.teams.away.name).indexOf(' ')+1)}</h2>
+          </div>
         </div>
       </div>
     </div>
