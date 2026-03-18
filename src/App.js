@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { doc, getDoc, addDoc, collection, getDocs } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { database } from './config/firebase';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
@@ -37,8 +36,8 @@ const GameStatistics = ({ game, shots }) => {
 
   const { shots: shotsArr } = shots;
 
-  const sorted = {}
-  {shotsArr.map((s) => {
+  const sorted = {};
+  shotsArr.forEach((s) => {
     const team = s.eventOwnerTeam;
     const type = s.typeDescKey;
 
@@ -47,7 +46,8 @@ const GameStatistics = ({ game, shots }) => {
     }
 
     sorted[team][type] = (sorted[team][type] || 0) + 1;
-  })}
+  });
+
   const getCount = (abbrev, type) => sorted[abbrev]?.[type] || 0;
 
   return (
@@ -66,9 +66,9 @@ const GameStatistics = ({ game, shots }) => {
         </thead>
         <tbody>
           <tr>
-            <td><img className='logo' src={`https://assets.nhle.com/logos/nhl/svg/${game.teams.home.abbrev}_light.svg`} /></td>
+            <td><img className='logo' src={`https://assets.nhle.com/logos/nhl/svg/${game.teams.home.abbrev}_light.svg`} alt="Home Logo"/></td>
             <td>{getCount(game.teams.home.abbrev, 'goal')} - {getCount(game.teams.away.abbrev, 'goal')}</td>
-            <td><img className='logo' src={`https://assets.nhle.com/logos/nhl/svg/${game.teams.away.abbrev}_light.svg`} /></td>
+            <td><img className='logo' src={`https://assets.nhle.com/logos/nhl/svg/${game.teams.away.abbrev}_light.svg`} alt="Away Logo" /></td>
           </tr>
           <tr>
             <td>{getCount(game.teams.home.abbrev, 'shot-on-goal')}</td>
@@ -103,7 +103,7 @@ const SelectedGame = ({ game, shots }) => {
       <h2 className='gameHeader'><span className='highlight'>P3</span>{game.period.timeRemaining}</h2>
       <div className='flex'>
         <div className='flex' style={{flexDirection: 'column'}}>
-          <img className='logo' src={`https://assets.nhle.com/logos/nhl/svg/${game.teams.home.abbrev}_light.svg`} />
+          <img className='logo' src={`https://assets.nhle.com/logos/nhl/svg/${game.teams.home.abbrev}_light.svg`} alt="Home Logo" />
           <h2>{(game.teams.home.name).slice((game.teams.home.name).indexOf(' ')+1)}</h2>
         </div>
         
@@ -113,7 +113,7 @@ const SelectedGame = ({ game, shots }) => {
         </div>
 
         <div className='flex' style={{flexDirection: 'column'}}>
-          <img className='logo' src={`https://assets.nhle.com/logos/nhl/svg/${game.teams.away.abbrev}_light.svg`} />
+          <img className='logo' src={`https://assets.nhle.com/logos/nhl/svg/${game.teams.away.abbrev}_light.svg`} alt="Away Logo"/>
           <h2>{(game.teams.away.name).slice((game.teams.away.name).indexOf(' ')+1)}</h2>
         </div>
       </div>
