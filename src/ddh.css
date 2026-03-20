@@ -142,3 +142,16 @@
   height: 120px;
   object-fit: contain;
 }
+
+.centered {
+  color: white;
+  display: flex;
+  justify-content: center;
+}
+
+.gameCard {
+    background: linear-gradient(180deg, rgba(38, 132, 255, 1) 0%, rgba(23, 79, 153, 1) 100%);
+    border: 2px solid #FFF;
+    border-radius: 25px;
+    color: white;
+}

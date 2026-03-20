@@ -109,7 +109,7 @@ const SelectedGame = ({ game, shots }) => {
         <div className='scoreRow'>
           <div className='teamSection'>
             <img className='logo' src={`https://assets.nhle.com/logos/nhl/svg/${game.teams.home.abbrev}_light.svg`} alt="Home Logo" />
-            <h2>{(game.teams.home.name).slice((game.teams.home.name).indexOf(' ')+1)}</h2>
+            <h2>{game.teams.home.name}</h2>
           </div>
           
           <div className='scoreSection'>
@@ -119,7 +119,7 @@ const SelectedGame = ({ game, shots }) => {
 
           <div className='teamSection'>
             <img className='logo' src={`https://assets.nhle.com/logos/nhl/svg/${game.teams.away.abbrev}_light.svg`} alt="Away Logo"/>
-            <h2>{(game.teams.away.name).slice((game.teams.away.name).indexOf(' ')+1)}</h2>
+            <h2>{game.teams.away.name}</h2>
           </div>
         </div>
 
@@ -203,16 +203,56 @@ const AllGames = ({ date }) => {
     fetchIds();
   }, [date]);
 
-  if (!games) { return <p style={{color:'white', display:'flex', justifyContent:'center'}}>Loading!</p> }
-  else if (games.length === 0) { return <p style={{color:'white', display:'flex', justifyContent:'center'}}>No games for this date!</p> }
+  if (!games) { return <p className='centered'>Loading!</p> }
+  else if (games.length === 0) { return <p className='centered'>No games for this date!</p> }
+
+  // Clean the data to account for missing fields.
+  const sanitize = (game) => {
+    const data = game?.gameData || {};
+    return {
+      period: data.period?.number ?? '',
+      timeRemaining: data.period?.timeRemaining ?? '',
+      home: {
+        name: data.teams?.home?.name ?? '',
+        abbrev: data.teams?.home?.abbrev ?? '',
+        score: data.teams?.home?.score ?? 0,
+      },
+      away: {
+        name: data.teams?.away?.name ?? '',
+        abbrev: data.teams?.away?.abbrev ?? '',
+        score: data.teams?.away?.score ?? 0,
+      }
+    };
+  };
+
   return (
-    <div style={{display:'flex', justifyContent:'center'}}>
-      <p style={{color:'white'}}>Games found for this date: {games.length}</p>
-      <ul>
-        {games.map((g, i) => {
-          return <li key={i} style={{color: "white"}}>{g.gameData.teams.home.abbrev} VS. {g.gameData.teams.away.abbrev}</li>
-        })}
-      </ul>
+    <div className='container'>
+      {games.map((g, i) => {
+        const c = sanitize(g);
+  
+        return <div key={g.id} className='gameCard'>
+                  <div className='headerRow'>
+                    <h2 className='gameHeader'>
+                      <span className='highlight'>P{c.period}</span>{c.timeRemaining}
+                    </h2>
+                  </div>
+
+                  <div className='scoreRow'>
+                    <div className='teamSection'>
+                      <img className='logo' src={`https://assets.nhle.com/logos/nhl/svg/${c.home.abbrev}_light.svg`} alt="Home Logo" />
+                      <h2>{c.home.name}</h2>
+                    </div>
+                    <div className='scoreSection'>
+                      <h1 className='scoreText'>{c.home.score} - {c.away.score}</h1>
+                      <p style={{ visibility: 'hidden' }}>hidden</p>
+                    </div>
+                    <div className='teamSection'>
+                      <img className='logo' src={`https://assets.nhle.com/logos/nhl/svg/${c.away.abbrev}_light.svg`} alt="Home Logo" />
+                      <h2>{c.away.name}</h2>
+                    </div>
+                  </div>
+               </div>
+      })}
     </div>
   )
 }
