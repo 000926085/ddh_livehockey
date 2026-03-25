@@ -6,6 +6,24 @@ import 'react-calendar/dist/Calendar.css';
 import './index.css';
 import './ddh.css';
 
+const Shot = ({ type, team }) => {
+  switch (type) {
+    case 'shot-on-goal':
+      return (
+        <svg height="50" width="50" xmlns="http://www.w3.org/2000/svg">
+          <circle r="20" cx="25" cy="25" fill="rgba(255, 0, 0, 66%)" stroke="rgba(128, 0, 0, 100%)" strokeWidth="1.5" />
+        </svg>
+      )
+
+    default:
+      return (
+        <svg height="50" width="50" xmlns="http://www.w3.org/2000/svg">
+          <circle r="20" cx="25" cy="25" fill="#FFF" stroke="#FFF" strokeWidth="1.5" />
+        </svg>
+      )
+  }
+}
+
 /**
  * Constructs a row of buttons to toggle the strength state of the shot map and game statistics.
  * @returns - div containing the buttons
@@ -209,7 +227,10 @@ const GameStatistics = ({ game }) => {
   return (
     <div style={{color: 'white'}}>
       {shotsArr.map((s, i) => {
-        return <p key={i} style={{color: "white"}}>{s.eventOwnerTeam}, {s.typeDescKey}, {s.player.shootingPlayer}, P#{s.period.number}, {s.period.timeInPeriod}</p>
+        return <div key={i}>
+                <p style={{color: "white"}}>{s.eventOwnerTeam}, {s.typeDescKey}, {s.player.shootingPlayer}, P#{s.period.number}, {s.period.timeInPeriod}</p>
+                <Shot type={s.typeDescKey} team={s.eventOwnerTeam}/>
+              </div>
       })}
       <h2 className='dashboard'>Game Statistics | {game.gameData.lastUpdated}</h2>
       <table style={{border: '1px solid white', textAlign: 'center'}}>
