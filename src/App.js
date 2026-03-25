@@ -5,23 +5,41 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import './index.css';
 import './ddh.css';
+import { TEAM_COLORS } from './constants/colours.js';
 
-const Shot = ({ type, team }) => {
-  switch (type) {
+const Shot = ({ data, onClick }) => {
+  const primary = TEAM_COLORS[data.eventOwnerTeam].primary;
+  const secondary = TEAM_COLORS[data.eventOwnerTeam].secondary;
+
+  switch (data.typeDescKey) {
     case 'shot-on-goal':
       return (
-        <svg height="50" width="50" xmlns="http://www.w3.org/2000/svg">
-          <circle r="20" cx="25" cy="25" fill="rgba(255, 0, 0, 66%)" stroke="rgba(128, 0, 0, 100%)" strokeWidth="1.5" />
+        <svg height="50" width="50" xmlns="http://www.w3.org/2000/svg" onClick={onClick}>
+          <circle r="20" cx="25" cy="25" fill={primary} stroke={secondary} strokeWidth="1.5" />
         </svg>
       )
 
     default:
       return (
-        <svg height="50" width="50" xmlns="http://www.w3.org/2000/svg">
-          <circle r="20" cx="25" cy="25" fill="#FFF" stroke="#FFF" strokeWidth="1.5" />
+        <svg height="50" width="50" xmlns="http://www.w3.org/2000/svg" onClick={onClick}>
+          <circle r="20" cx="25" cy="25" fill={primary} stroke={secondary} strokeWidth="1.5" />
         </svg>
       )
   }
+}
+
+const ShotMap = ({ arr }) => {
+  const [selectedShot, setShot] = useState(null);
+  if (!arr) { return <div>Loading!</div> }
+
+  return (
+    <div>
+      <p>{selectedShot ? JSON.stringify(selectedShot, null, 2) : "No shot selected!"}</p>
+      {arr.map((s) => (
+        <Shot key={s.id} data={s} onClick={() => setShot(s)} />
+      ))}
+    </div>
+  )
 }
 
 /**
@@ -219,6 +237,9 @@ const GameStatistics = ({ game }) => {
     if (!sorted[team]) { sorted[team] = {}; }
 
     sorted[team][type] = (sorted[team][type] || 0) + 1;
+
+    // Goals are considered shots-on-goal.
+    if (type === 'goal') { sorted[team]['shot-on-goal'] = (sorted[team]['shot-on-goal'] || 0) + 1; }
   });
 
   // Get the amount of shots of a given type if it exists, 0 if it does not.
@@ -226,12 +247,7 @@ const GameStatistics = ({ game }) => {
 
   return (
     <div style={{color: 'white'}}>
-      {shotsArr.map((s, i) => {
-        return <div key={i}>
-                <p style={{color: "white"}}>{s.eventOwnerTeam}, {s.typeDescKey}, {s.player.shootingPlayer}, P#{s.period.number}, {s.period.timeInPeriod}</p>
-                <Shot type={s.typeDescKey} team={s.eventOwnerTeam}/>
-              </div>
-      })}
+      <ShotMap key={game.id} arr={shotsArr} />
       <h2 className='dashboard'>Game Statistics | {game.gameData.lastUpdated}</h2>
       <table style={{border: '1px solid white', textAlign: 'center'}}>
         <thead>
