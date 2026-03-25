@@ -112,7 +112,7 @@ const AllGames = ({ date }) => {
         {games.map((g, i) => {
           const c = sanitize(g);
     
-          return <div key={g.id} className='gameCard' style={ selectedGame == g.id ? {border: "2px solid #072c7e"} : {}} onClick={() => setSelected(g.id)}>
+          return <div key={g.id} className='gameCard' style={ selectedGame === g.id ? {border: "2px solid #072c7e"} : {}} onClick={() => setSelected(g.id)}>
                     <div className='headerRow'>
                       <h2 className='gameHeader'>
                         <span className='highlight'>P{c.period}</span>{c.timeRemaining}
