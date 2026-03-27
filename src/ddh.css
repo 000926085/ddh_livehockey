@@ -156,3 +156,8 @@
     border-radius: 25px;
     color: white;
 }
+
+.rink {
+  width: 80%;
+  height: auto;
+}

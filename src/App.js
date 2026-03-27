@@ -5,6 +5,7 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import './index.css';
 import './ddh.css';
+import rink from './assets/hockeyrink.png';
 import { TEAM_COLORS } from './constants/colours.js';
 
 const Shot = ({ data, onClick }) => {
@@ -30,7 +31,17 @@ const Shot = ({ data, onClick }) => {
 
 const ShotMap = ({ arr }) => {
   const [selectedShot, setShot] = useState(null);
+  const [imgSize, setImgSize] = useState({width: 0, height: 0});
+
+  console.log(imgSize); // this is just so eslint won't whine about an unused var...
+
   if (!arr) { return <div>Loading!</div> }
+  else if (arr.length === 0) { return <div>No shots found for the selected game.</div>}
+
+  const onLoadImage = (e) => {
+    const { width, height } = e.currentTarget;
+    setImgSize({ width, height });
+  };
 
   return (
     <div>
@@ -38,6 +49,9 @@ const ShotMap = ({ arr }) => {
       {arr.map((s) => (
         <Shot key={s.id} data={s} onClick={() => setShot(s)} />
       ))}
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <img src={rink} className="rink" alt="Blank hockey rink." onLoad={onLoadImage} />
+      </div>
     </div>
   )
 }
@@ -123,9 +137,14 @@ const AllGames = ({ date }) => {
   // Clean the data to account for missing fields.
   const sanitize = (game) => {
     const data = game?.gameData || {};
+    const shots = game?.shots || {};
+
     return {
       period: data.period?.number ?? '',
       timeRemaining: data.period?.timeRemaining ?? '',
+      lastUpdated: data.lastUpdated ?? '',
+      gameState: data.gameState ?? '',
+      scheduled: data.scheduled ?? '',
       home: {
         name: data.teams?.home?.name ?? '',
         abbrev: data.teams?.home?.abbrev ?? '',
@@ -135,7 +154,8 @@ const AllGames = ({ date }) => {
         name: data.teams?.away?.name ?? '',
         abbrev: data.teams?.away?.abbrev ?? '',
         score: data.teams?.away?.score ?? 0,
-      }
+      },
+      shots: shots
     };
   };
   
@@ -147,11 +167,20 @@ const AllGames = ({ date }) => {
       <div className='container'>
         {games.map((g, i) => {
           const c = sanitize(g);
-    
+
           return <div key={g.id} className='gameCard' style={ selectedGame === g.id ? {border: "2px solid #072c7e"} : {}} onClick={() => setSelected(g.id)}>
                     <div className='headerRow'>
                       <h2 className='gameHeader'>
-                        <span className='highlight'>P{c.period}</span>{c.timeRemaining}
+                        {c.gameState === 'FUT' ? (
+                          <>
+                            <span className='highlight'>{c.scheduled} | EST</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className='highlight'>P{c.period}</span>
+                            {c.timeRemaining}
+                          </>
+                        )}
                       </h2>
                     </div>
 
@@ -172,9 +201,9 @@ const AllGames = ({ date }) => {
                 </div>
         })}
       </div>
-      <ChosenGame game={selectedData} />
+      <ChosenGame game={sanitize(selectedData)} />
       <StrengthToggle />
-      <GameStatistics game={selectedData} />
+      <GameStatistics game={sanitize(selectedData)} />
     </div>
   )
 }
@@ -192,25 +221,34 @@ const ChosenGame = ({ game }) => {
         {/* Period/Time Remaining */}
         <div className='headerRow'>
             <h2 className='gameHeader'>
-              <span className='highlight'>P3</span>{game.gameData.period.timeRemaining}
+              {game.gameState === 'FUT' ? (
+                <>
+                  <span className='highlight'>{game.scheduled} | EST</span>
+                </>
+              ) : (
+                <>
+                  <span className='highlight'>P{game.period}</span>
+                  {game.timeRemaining}
+                </>
+              )}
             </h2>
         </div>
 
         {/* Teams and Score */}
         <div className='scoreRow'>
           <div className='teamSection'>
-            <img className='logo' src={`https://assets.nhle.com/logos/nhl/svg/${game.gameData.teams.home.abbrev}_light.svg`} alt="Home Logo" />
-            <h2>{game.gameData.teams.home.name}</h2>
+            <img className='logo' src={`https://assets.nhle.com/logos/nhl/svg/${game.home.abbrev}_light.svg`} alt="Home Logo" />
+            <h2>{game.home.name}</h2>
           </div>
           
           <div className='scoreSection'>
-            <h1 className='scoreText'>{game.gameData.teams.home.score} - {game.gameData.teams.away.score}</h1>
+            <h1 className='scoreText'>{game.home.score} - {game.away.score}</h1>
             <p style={{ visibility: 'hidden' }}>hidden</p>
           </div>
 
           <div className='teamSection'>
-            <img className='logo' src={`https://assets.nhle.com/logos/nhl/svg/${game.gameData.teams.away.abbrev}_light.svg`} alt="Away Logo"/>
-            <h2>{game.gameData.teams.away.name}</h2>
+            <img className='logo' src={`https://assets.nhle.com/logos/nhl/svg/${game.away.abbrev}_light.svg`} alt="Away Logo"/>
+            <h2>{game.away.name}</h2>
           </div>
         </div>
       </div>
@@ -225,7 +263,7 @@ const ChosenGame = ({ game }) => {
  */
 const GameStatistics = ({ game }) => {
   if (!game) { return <div><p>Loading!</p></div> }
-  const { shots: shotsArr } = game.shots;
+  const shotsArr = game.shots?.shots || [];
 
   // Loop through the fetched shots and organize them by team, then type.
   const sorted = {};
@@ -248,35 +286,35 @@ const GameStatistics = ({ game }) => {
   return (
     <div style={{color: 'white'}}>
       <ShotMap key={game.id} arr={shotsArr} />
-      <h2 className='dashboard'>Game Statistics | {game.gameData.lastUpdated}</h2>
+      <h2 className='dashboard'>Game Statistics | {game.lastUpdated}</h2>
       <table style={{border: '1px solid white', textAlign: 'center'}}>
         <thead>
           <tr>
-            <th>{game.gameData.teams.home.abbrev}</th>
+            <th>{game.home.abbrev}</th>
             <th></th>
-            <th>{game.gameData.teams.away.abbrev}</th>
+            <th>{game.away.abbrev}</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td><img className='logo' src={`https://assets.nhle.com/logos/nhl/svg/${game.gameData.teams.home.abbrev}_light.svg`} alt="Home Logo"/></td>
-            <td>{getCount(game.gameData.teams.home.abbrev, 'goal')} - {getCount(game.gameData.teams.away.abbrev, 'goal')}</td>
-            <td><img className='logo' src={`https://assets.nhle.com/logos/nhl/svg/${game.gameData.teams.away.abbrev}_light.svg`} alt="Away Logo" /></td>
+            <td><img className='logo' src={`https://assets.nhle.com/logos/nhl/svg/${game.home.abbrev}_light.svg`} alt="Home Logo"/></td>
+            <td>{getCount(game.home.abbrev, 'goal')} - {getCount(game.away.abbrev, 'goal')}</td>
+            <td><img className='logo' src={`https://assets.nhle.com/logos/nhl/svg/${game.away.abbrev}_light.svg`} alt="Away Logo" /></td>
           </tr>
           <tr>
-            <td>{getCount(game.gameData.teams.home.abbrev, 'shot-on-goal')}</td>
+            <td>{getCount(game.home.abbrev, 'shot-on-goal')}</td>
             <td>Shots-On-Goal</td>
-            <td>{getCount(game.gameData.teams.away.abbrev, 'shot-on-goal')}</td>
+            <td>{getCount(game.away.abbrev, 'shot-on-goal')}</td>
           </tr>
           <tr>
-            <td>{getCount(game.gameData.teams.home.abbrev, 'blocked-shot')}</td>
+            <td>{getCount(game.home.abbrev, 'blocked-shot')}</td>
             <td>Blocked Shots</td>
-            <td>{getCount(game.gameData.teams.away.abbrev, 'blocked-shot')}</td>
+            <td>{getCount(game.away.abbrev, 'blocked-shot')}</td>
           </tr>
           <tr>
-            <td>{getCount(game.gameData.teams.home.abbrev, 'missed-shot')}</td>
+            <td>{getCount(game.home.abbrev, 'missed-shot')}</td>
             <td>Missed Shots</td>
-            <td>{getCount(game.gameData.teams.away.abbrev, 'missed-shot')}</td>
+            <td>{getCount(game.away.abbrev, 'missed-shot')}</td>
           </tr>
         </tbody>
       </table>
