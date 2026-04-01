@@ -1,3 +1,14 @@
+#ddh-app-root, #ddh-app-root * {
+    all: unset; 
+    box-sizing: border-box;
+    display: revert; 
+}
+
+#ddh-app-root {
+    font-family: Arial, sans-serif;
+    line-height: 1.2;
+}
+
 #ddh-app-root {
   font-size: 16px !important;
   line-height: 1.2 !important;
@@ -40,12 +51,12 @@
     line-height: 1 !important;
     white-space: nowrap !important;
     font-size: 1.6rem;
-    font-weight: 900;
+    font-weight: 700;
 }
 
 #ddh-app-root .teamLogo {
-    width: 42px !important;
-    height: 42px !important;
+    width: 120px !important;
+    height: 120px !important;
     display: block !important;
     object-fit: contain !important;
 }
@@ -77,8 +88,8 @@
 }
 
 .headerR {
-  display: flex;
-  justify-content: center;
+  display: flex !important;
+  justify-content: center !important;
   width: 100%;
 }
 
