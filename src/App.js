@@ -200,23 +200,23 @@ const GameCard = ({ game, selected, onSelect }) => {
   return (
     <div className='gameCard' style={selected ? { border: "2px solid #072c7e" } : {}} onClick={onSelect}>
       {/* Period/Time Info */}
-      <div className='headerRow'>
+      <div className='headerR'>
         <h2 className='gameHeader'>{gameStatus(game)}</h2>
       </div>
 
       {/* Score and Team Icons */}
-      <div className='scoreRow'>
-        <div className='teamCol'>
+      <div className='scoreR'>
+        <div className='teamC'>
           <img className='teamLogo' src={`https://assets.nhle.com/logos/nhl/svg/${game.home.abbrev}_light.svg`} alt="Home" />
         </div>
 
-        <div className='scoreColumn'>
+        <div>
           <h1 className='scoreDisplay'>
             {game.gameState === 'FUT' ? "0 - 0" : `${game.home.score} - ${game.away.score}`}
           </h1>
         </div>
 
-        <div className='teamCol'>
+        <div className='teamC'>
           <img className='teamLogo' src={`https://assets.nhle.com/logos/nhl/svg/${game.away.abbrev}_light.svg`} alt="Away" />
         </div>
       </div>
@@ -340,7 +340,7 @@ const ChosenGame = ({ game }) => {
       <div className='selectedGame'>
 
         {/* Period/Time Remaining */}
-        <div className='headerRow'>
+        <div className='headerR'>
             <h2 className='gameHeader'>
               {game.gameState === 'FUT' ? (
                 <>
@@ -356,7 +356,7 @@ const ChosenGame = ({ game }) => {
         </div>
 
         {/* Teams and Score */}
-        <div className='scoreRow'>
+        <div className='scoreR'>
           <div className='teamSection'>
             <img className='logo' src={`https://assets.nhle.com/logos/nhl/svg/${game.home.abbrev}_light.svg`} alt="Home Logo" />
             <h2>{game.home.name}</h2>

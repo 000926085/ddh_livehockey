@@ -44,7 +44,7 @@
   margin: 10px 0 1px 0;
 }
 
-.headerRow {
+.headerR {
   display: flex;
   justify-content: center;
   width: 100%;
@@ -125,18 +125,14 @@
   transform: scale(0.95); 
 }
 
-#ddh-app-root .gameCard {
-  font-size: medium !important;
-}
-
-.scoreRow {
+.scoreR {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
 }
 
-.teamCol {
+.teamC {
   flex: 1;
   display: flex;
   flex-direction: column;
