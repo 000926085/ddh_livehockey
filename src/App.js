@@ -12,9 +12,12 @@ import { TEAM_COLORS } from './constants/colours.js';
  * @param {*} arr array containing the shots for the selected game. 
  * @returns a div holding the SVG representation of a hockey rink.
  */
-const SVGRink = ( {arr} ) => {
+const SVGRink = ( {arr, gameid, home, away} ) => {
   const [selectedShot, setSelectedShot] = useState(null);
   if (!arr) { return <div>Loading!</div> }
+  
+  const homeLogoUrl = `https://assets.nhle.com/logos/nhl/svg/${home.abbrev}_light.svg`;
+  const awayLogoUrl = `https://assets.nhle.com/logos/nhl/svg/${away.abbrev}_light.svg`;
 
   return (
     <div style={{width: "95%"}}>
@@ -23,6 +26,12 @@ const SVGRink = ( {arr} ) => {
       )}
       
       <svg viewBox="-1 -1 202 87">
+        <defs>
+          <clipPath id="rinkClip">
+            <rect x="0" y="0" width="200" height="85" rx="15" ry="15" />
+          </clipPath>
+        </defs>
+
         {/* Rink Boundary */}
         <rect x="0" y="0" width="200" height="85" rx="15" ry="15" fill="#f0f0f0" stroke="black" strokeWidth="0.33" />
 
@@ -45,6 +54,10 @@ const SVGRink = ( {arr} ) => {
         <circle cx="117.5" cy="21.25" r="0.5" stroke="rgb(200, 16, 46)" />
         <circle cx="117.5" cy="63.75" r="0.5" stroke="rgb(200, 16, 46)" />
 
+        {/* Team Logos */}
+        <image href={homeLogoUrl} x="27" y="26.5" width="32" height="32" opacity="0.33" />
+        <image href={awayLogoUrl} x="141" y="26.5" width="32" height="32" opacity="0.33" />
+
         {/* End Zone Faceoff Circles */}
         <circle cx="35" cy="21.25" r="12.5" fill="none" stroke="rgb(200, 16, 46)" strokeWidth="0.33" />
         <circle cx="35" cy="21.25" r="0.5" stroke="rgb(200, 16, 46)" />
@@ -62,9 +75,25 @@ const SVGRink = ( {arr} ) => {
         <path d="M 189 36.5 A 6 6 0 0 0 189 48.5" fill="rgba(0, 150, 255, 0.2)" stroke="rgb(200, 16, 46)" strokeWidth="0.33" />
 
         {/* Shot Mapping */}
-        {arr.map((s) => (
-          <Shot key={s.id} shot={s} selected={selectedShot?.id === s.id} onClick={() => setSelectedShot(s)}/>
-        ))}
+        <g clipPath="url(#rinkClip)">
+          {Array.from(new Set(arr.map(s => s.id))).map(id => {
+            const s = arr.find(shot => shot.id === id);
+    
+            // Handle mirroring the shots during the second period.
+            const displayCoords = s.period.number === 2 
+              ? { x: s.coords.xCoord * -1, y: s.coords.yCoord * -1 }
+              : { x: s.coords.xCoord, y: s.coords.yCoord };
+
+            return (
+              <Shot 
+                key={`${gameid}-${id}`} 
+                shot={{ ...s, coords: { ...s.coords, xCoord: displayCoords.x, yCoord: displayCoords.y } }}
+                selected={selectedShot?.id === s.id} 
+                onClick={() => setSelectedShot(s)} 
+              />
+            );
+          })}
+        </g>
 
         {/* Cover for any clipping lines */}
         <rect x="0" y="0" width="200" height="85" rx="15" fill="none" stroke="black" strokeWidth="0.33" />
@@ -201,8 +230,11 @@ const AllGames = ({ date }) => {
   const sanitize = (game) => {
     const data = game?.gameData || {};
     const shots = game?.shots || {};
+    const g_id = game?.id || "";
 
     return {
+      id: g_id,
+      gameDate: data.gameDate ?? '',
       period: data.period?.number ?? '',
       timeRemaining: data.period?.timeRemaining ?? '',
       lastUpdated: data.lastUpdated ?? '',
@@ -229,7 +261,7 @@ const AllGames = ({ date }) => {
 
   return (
     <div>
-      <div className='container'>
+      <div className='container' style={{flexWrap: 'wrap'}}>
         {games.map((g, i) => {
           const c = sanitize(g);
 
@@ -333,10 +365,11 @@ const ToggleMenu = ({ category, options, selected, onToggle}) => {
   const [active, setActive] = useState(false);
 
   return (
-    <div>
-      <label>{category}</label>
-      <div onClick={() => setActive(!active)}>
-        {selected.length} selected <span>{active ? '▲' : '▼'}</span>
+    <div className="filter-container">
+      <span>{category.replace(/([A-Z])/g, ' $1')}</span>
+      <div className="filter-pill" onClick={() => setActive(!active)}>
+        <span>{selected.length === options.length ? 'All' : `${selected.length} Selected`}</span>
+        <span>{active ? '∧' : '∨'}</span>
       </div>
 
       {active && (
@@ -371,13 +404,13 @@ const GameStatistics = ({ game }) => {
   useEffect(() => {
     if (game) {
       const newPlayers = [
-        ...game.home.players,
-        ...game.away.players
+        ...game.home.players.map(p => p.player),
+        ...game.away.players.map(p => p.player)
       ];
       
       setFilters(prev => ({
         ...prev,
-        players: newPlayers
+        players: newPlayers 
       }));
     }
   }, [game]);
@@ -411,8 +444,8 @@ const GameStatistics = ({ game }) => {
       ...game.home.players,
       ...game.away.players
     ].map(p => ({
-      label: p, 
-      value: p 
+      label: p.player, 
+      value: p.player 
     }))
   }
 
@@ -451,8 +484,8 @@ const GameStatistics = ({ game }) => {
     const typeMatch = filters.shotType.includes(s.typeDescKey);
     const periodMatch = filters.period.includes(s.period.number);
     const positionMatch = filters.position.includes(s.player?.position);
-    const playerMatch = filters.players.includes(s.player?.shootingPlayer);
-    return typeMatch && periodMatch && positionMatch && playerMatch;
+    // const playerMatch = filters.players.includes(s.player?.shootingPlayer);
+    return typeMatch && periodMatch && positionMatch // && playerMatch;
   });
 
   return (
@@ -460,12 +493,12 @@ const GameStatistics = ({ game }) => {
       {/* Rink and Toggles */}
       <div className='rinkcard'>
         <h2 className='gameHeader'>Shotmap | <i>Last Updated: {game.lastUpdated}</i></h2>
-        <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center'}}>
+        <div className='filter-row'>
           {Object.entries(dropdownOptions).map(([category, options]) => (
             <ToggleMenu key={category} category={category} options={options} selected={filters[category]} onToggle={(v) => toggleFilter(category, v)} />
           ))}
         </div>    
-        <SVGRink key={game.id} arr={filteredShots} />
+        <SVGRink key={game.id} arr={filteredShots} gameid={game.id} home={game.home} away={game.away} />
       </div>
 
       <h2 className='dashboard'>Game Statistics | {game.lastUpdated}</h2>
@@ -505,7 +538,7 @@ const GameStatistics = ({ game }) => {
 }
 
 function App({ pageId }) {
-  const [date, onChange] = useState(new Date(2026, 2, 10));  // using as a testing date.
+  const [date, onChange] = useState(new Date(2026, 2, 31));  // using as a testing date.
   // const [value, onChange] = useState(new Date());
 
   return (
