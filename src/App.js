@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { doc, collection, getDoc, getDocs, onSnapshot } from "firebase/firestore";
+import { doc, collection, onSnapshot } from "firebase/firestore";
 import { database } from './config/firebase';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
