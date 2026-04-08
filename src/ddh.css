@@ -371,16 +371,16 @@
   flex-direction: row !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 8px !important;
   width: 100% !important;
   padding: 5px 0 10px 0 !important;
 }
 
 #ddh-app-root .teamC {
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  flex: 0 0 auto !important; 
+  flex: 1; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 #ddh-app-root .scoreDisplay {
@@ -389,11 +389,13 @@
   white-space: nowrap !important;
   font-size: 2.0rem;
   font-weight: 700;
+  white-space: nowrap;
+  padding: 0 10px;
 }
 
 #ddh-app-root .teamDisplay {
-  font-size: 1.8rem;
-  font-weight: 500;
+  font-size: 1.8rem !important;
+  font-weight: 600 !important;
 }
 
 #ddh-app-root .teamLogo {

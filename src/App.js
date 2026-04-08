@@ -438,11 +438,9 @@ const ChosenGame = ({ game }) => {
 
         {/* Period/Time Remaining */}
         <div className='headerR'>
-            <h2 className='gameHeader'>
-              {gameStatus(game)}
-            </h2>
+          <h2 className='gameHeader'>{gameStatus(game)}</h2>
         </div>
-
+        
         {/* Teams and Score */}
         <div className='scoreR'>
           <div className='teamC'>
