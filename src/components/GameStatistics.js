@@ -177,8 +177,15 @@ const GameStatistics = ({ game, strength }) => {
     <div style={{color: 'white'}}>
       {/* Rink and Toggles */}
       <div className='rinkcard'>
-        <h2 className='gameHeader'>Shotmap • <i>Last Updated: {time}</i></h2>
-        <div style={{textAlign: 'center', margin: '4px 4px 0 4px'}}>
+        <div className='game-statistics-header' style={{ textAlign: 'center' }}>
+          <h2 className='gameHeader'>
+            <span>Game Statistics</span>
+            <i style={{ fontSize: '1.0rem' }}>
+              Updated: {time}
+            </i>
+          </h2>
+        </div>
+        <div style={{textAlign: 'center'}}>
           <i>Data reflects plays made under the <b>{strength.toUpperCase()}</b> strength state.</i>
         </div>
         <div className='filter-row'>
@@ -186,29 +193,29 @@ const GameStatistics = ({ game, strength }) => {
             <ToggleMenu key={category} category={category} options={options} selected={filters[category]} onToggle={(v) => toggleFilter(category, v)} />
           ))}
         </div>    
-        <div style={{display: 'flex', flexDirection: 'row', gap: '20px', justifyContent: 'center', margin: '4px 10px'}}>
-          <div style={{display: 'flex', alignItems: 'center'}}>
+        <div className='legend'>
+          <div className='legend-item'>
             <p style={{ margin: '0 8px 0 0' }}>Goal</p>
             <svg width="25" height="25" viewBox="0 0 100 100" style={{ overflow: 'visible' }}>
               <polygon {...common} points="50,-5 0,85 100,85" />
             </svg>
           </div>
 
-          <div style={{display: 'flex', alignItems: 'center'}}>
+          <div className='legend-item'>
             <p style={{ margin: '0 8px 0 0' }}>Shot-On-Goal</p>
             <svg width="25" height="25" viewBox="0 0 100 100" style={{ overflow: 'visible' }}>
               <circle {...common} cx={50} cy={50} r="40" />
             </svg>
           </div>
 
-          <div style={{display: 'flex', alignItems: 'center'}}>
+          <div className='legend-item'>
             <p style={{ margin: '0 8px 0 0' }}>Missed Shot</p>
             <svg width="25" height="25" viewBox="0 0 100 100" style={{ overflow: 'visible' }}>
               <rect {...common} x="10" y="10" width="80" height="80" rx="15" />
             </svg>
           </div>
 
-          <div style={{display: 'flex', alignItems: 'center'}}>
+          <div className='legend-item'>
             <p style={{ margin: '0 8px 0 0' }}>Blocked Shot</p>
             <svg width="25" height="25" viewBox="0 0 100 100" style={{ overflow: 'visible' }}>
               <polygon {...common} points="50,5 95,50 50,95 5,50" />
@@ -220,10 +227,15 @@ const GameStatistics = ({ game, strength }) => {
 
       {/* Statistics Table */}
       <div className='game-statistics'>
-          <div className='game-statistics-header'>
-            <h2 className='gameHeader'>Game Statistics • <i>Last Updated: {time}</i></h2>
-          </div>
-          <div style={{textAlign: 'center', margin: '4px'}}>
+        <div className='game-statistics-header' style={{ textAlign: 'center' }}>
+          <h2 className='gameHeader'>
+            <span>Game Statistics</span>
+            <i style={{ fontSize: '1.0rem' }}>
+              Updated: {time}
+            </i>
+          </h2>
+        </div>
+          <div style={{textAlign: 'center'}}>
             <i>Data reflects plays made under the <b>{strength.toUpperCase()}</b> strength state.</i>
           </div>
 
