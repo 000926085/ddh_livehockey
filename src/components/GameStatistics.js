@@ -179,7 +179,7 @@ const GameStatistics = ({ game, strength }) => {
       <div className='rinkcard'>
         <div className='game-statistics-header' style={{ textAlign: 'center' }}>
           <h2 className='gameHeader'>
-            <span>Game Statistics</span>
+            <span style={{ fontSize: '1.5rem' }}>Shotmap</span>
             <i style={{ fontSize: '1.0rem' }}>
               Updated: {time}
             </i>
@@ -229,7 +229,7 @@ const GameStatistics = ({ game, strength }) => {
       <div className='game-statistics'>
         <div className='game-statistics-header' style={{ textAlign: 'center' }}>
           <h2 className='gameHeader'>
-            <span>Game Statistics</span>
+            <span style={{ fontSize: '1.5rem' }}>Game Statistics</span>
             <i style={{ fontSize: '1.0rem' }}>
               Updated: {time}
             </i>

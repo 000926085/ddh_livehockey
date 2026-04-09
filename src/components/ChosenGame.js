@@ -10,7 +10,7 @@ const ChosenGame = ({ game }) => {
       case 'FUT':
       case 'PRE':
         return (
-          <span className='highlight'>
+          <span className='highlight' style={{fontSize: '1.5rem', fontWeight: 'bold'}}>
             {new Date(game.startTimeUTC).toLocaleTimeString('en-US', {
               hour: 'numeric',
               minute: '2-digit',
@@ -23,31 +23,33 @@ const ChosenGame = ({ game }) => {
 
       case 'LIVE':
       case 'CRIT':
-      return <>
+      return <div style={{fontSize: '1.5rem', fontWeight: 'bold'}}>
               <span className='highlight'>
-                      {game.period <= 3 ? `P${game.period}` : 'OT'}
-                  </span>
-                  {" "}
-                  <span>
-                      {game.inIntermission 
-                          ? 'END' 
-                          : game.timeRemaining
-                      }
-                  </span>
-              </>
+                {game.period <= 3 ? `P${game.period}` : 'OT'}
+              </span>
+              {" "}
+              <span>
+                {game.inIntermission 
+                  ? 'END' 
+                  : game.timeRemaining
+                }
+              </span>
+            </div>
 
       case 'FINAL':
       case 'OFF':
         return (
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-          <span>FINAL</span>
-          {(c.periodType === 'OT' || c.periodType === 'SO') && (
-            <>
-              <span>•</span>
-              <span className="highlight">{c.periodType}</span>
-            </>
-          )}
-        </span>
+          <div style={{fontSize: '1.5rem', fontWeight: 'bold'}}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            <span>FINAL</span>
+            {(c.periodType === 'OT' || c.periodType === 'SO') && (
+              <>
+                <span>•</span>
+                <span className="highlight">{c.periodType}</span>
+              </>
+            )}
+            </span>
+          </div>
         );
 
       default:
