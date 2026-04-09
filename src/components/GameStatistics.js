@@ -76,6 +76,7 @@ const GameStatistics = ({ game, strength }) => {
         players: newPlayers 
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [game?.id]);
 
   if (!game) { return <div><p>Loading!</p></div> }
