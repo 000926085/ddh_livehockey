@@ -80,12 +80,26 @@ const GameStatistics = ({ game, strength }) => {
 
   // Helper function to generalize the toggling functionality for dropdown menus.
   const toggleFilter = (category, value) => {
-    setFilters(prev => ({
-      ...prev, 
-      [category]: prev[category].includes(value)
-        ? prev[category].filter(v => v !== value) // remove from filters
-        : [...prev[category], value]  // add to filters
-    }));
+    setFilters(prev => {
+      // Select All
+      if (Array.isArray(value)) {
+        return {
+          ...prev,
+          [category]: value
+        };
+      }
+
+      // Single item toggles.
+      const currentList = prev[category];
+      const newList = currentList.includes(value)
+        ? currentList.filter(v => v !== value)
+        : [...currentList, value];
+
+      return {
+        ...prev,
+        [category]: newList
+      };
+    });
   };
 
   const shotsArr = game.shots?.shots || [];
