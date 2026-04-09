@@ -7,6 +7,7 @@ import './index.css';
 import './ddh.css';
 import { TEAM_COLOURS } from './constants/colours.js';
 import SVGRink from './components/SVGRink';
+import GameCard from './components/GameCard.js';
 
 /**
  * Constructs a row of buttons to toggle the strength state of the shot map and game statistics.
@@ -33,77 +34,6 @@ const StrengthToggle = ({active, onChange}) => {
   );
 }
 
-const GameCard = ({ game, selected, onSelect }) => {
-  if (!game) { return <p className='centered'>Loading!</p> }
-
-  // Determine how to fill the header text.
-  const gameStatus = (c) => {
-    switch (c.gameState) {
-      case 'FUT':
-        return (
-          <span className='highlight'>
-            {new Date(game.startTimeUTC).toLocaleTimeString('en-US', {
-              hour: 'numeric',
-              minute: '2-digit',
-              second: '2-digit',
-              hour12: true,
-              timeZoneName: 'short' 
-            })}
-          </span>
-        );
-
-      case 'LIVE':
-      case 'CRIT':
-        return (
-          <><span className='highlight'>{c.period <= 3 ? `P${c.period}` : 'OT'}</span>{c.timeRemaining}</>
-        );
-
-      case 'FINAL':
-      case 'OFF':
-        return (
-          <span>
-            <span>FINAL </span>
-            {(c.periodType === 'OT' || c.periodType === 'SO') && (
-              <>
-                <span>• </span>
-                <span className="highlight">{c.periodType}</span>
-              </>
-            )}
-          </span>
-        );
-
-      default:
-        return <span></span>;
-    }
-  };
-
-  return (
-    <div className='gameCard' style={selected ? { border: "2px solid #072c7e" } : {}} onClick={onSelect}>
-      {/* Period/Time Info */}
-      <div className='headerR'>
-        <h2 className='gameHeader'>{gameStatus(game)}</h2>
-      </div>
-
-      {/* Score and Team Icons */}
-      <div className='scoreR'>
-        <div className='teamC'>
-          <img className='teamLogo' src={`https://assets.nhle.com/logos/nhl/svg/${game.home.abbrev}_light.svg`} alt="Home" />
-        </div>
-
-        <div>
-          <h1 className='scoreDisplay'>
-            {game.gameState === 'FUT' ? "0 - 0" : `${game.home.score} - ${game.away.score}`}
-          </h1>
-        </div>
-
-        <div className='teamC'>
-          <img className='teamLogo' src={`https://assets.nhle.com/logos/nhl/svg/${game.away.abbrev}_light.svg`} alt="Away" />
-        </div>
-      </div>
-    </div>
-  )
-}
-
 /**
  * Fetches all of the games for the provided date.
  * @param {*} date - the date selected by the user.
@@ -120,13 +50,17 @@ const AllGames = ({ date }) => {
     const formattedDate = date.toLocaleDateString('en-ZA').replaceAll("/", "-");
     const dateRef = doc(database, "Games", formattedDate);
 
+    let gameUnsubs = [];
+    const cleanupListeners = () => {
+      gameUnsubs.forEach(unsub => unsub());
+      gameUnsubs = [];
+    }
+
     const unsubscribeDate = onSnapshot(dateRef, (snap) => {
       // If there is a document for the date, continue.
       if (snap.exists() && snap.data().games) {
         const ids = snap.data().games;
-
-        // Keep track of individual game unsubscribes.
-        const gameUnsubs = [];
+        cleanupListeners();
 
         ids.forEach((id) => {
           const gameRef = collection(database, "Games", formattedDate, String(id));
@@ -155,19 +89,20 @@ const AllGames = ({ date }) => {
 
           gameUnsubs.push(unsubGame);
         })
-
-        // Cleanup for listeners.
-        return () => gameUnsubs.forEach(unsub => unsub());
       } 
       
       // If not, no games must exist for that date.
       else {
+        cleanupListeners();
         setGames([]);
       }
     }, (err) => console.error("Fetch failed: ", err));
 
     // Cleanup main listener for when the date changes.
-    return () => unsubscribeDate();
+    return () => {
+      unsubscribeDate();
+      cleanupListeners();
+    };
   }, [date]);
 
   if (!games) { return <p className='centered'>Loading!</p> }
@@ -185,11 +120,13 @@ const AllGames = ({ date }) => {
       period: data.period?.number ?? '',
       periodType: data.period?.periodType ?? '',
       timeRemaining: data.period?.timeRemaining ?? '',
+      inIntermission: data.period?.inIntermission ?? '',
       lastUpdated: data.lastUpdated ?? '',
       gameState: data.gameState ?? '',
       scheduled: data.scheduled ?? '',
       startTimeUTC: data.startTimeUTC ?? '',
       isShootoutGame: '',
+      homeTeamDefendingSide: data.homeTeamDefendingSide ?? '',
       home: {
         name: data.teams?.home?.name ?? '',
         abbrev: data.teams?.home?.abbrev ?? '',
@@ -257,6 +194,7 @@ const ChosenGame = ({ game }) => {
   const gameStatus = (c) => {
     switch (c.gameState) {
       case 'FUT':
+      case 'PRE':
         return (
           <span className='highlight'>
             {new Date(game.startTimeUTC).toLocaleTimeString('en-US', {
@@ -271,22 +209,31 @@ const ChosenGame = ({ game }) => {
 
       case 'LIVE':
       case 'CRIT':
-        return (
-          <><span className='highlight'>{c.period <= 3 ? `P${c.period}` : 'OT'}</span>{c.timeRemaining}</>
-        );
+      return <>
+              <span className='highlight'>
+                      {game.period <= 3 ? `P${game.period}` : 'OT'}
+                  </span>
+                  {" "}
+                  <span>
+                      {game.inIntermission 
+                          ? 'END' 
+                          : game.timeRemaining
+                      }
+                  </span>
+              </>
 
       case 'FINAL':
       case 'OFF':
         return (
-          <span>
-            <span>FINAL </span>
-            {(c.periodType === 'OT' || c.periodType === 'SO') && (
-              <>
-                <span>• </span>
-                <span className="highlight">{c.periodType}</span>
-              </>
-            )}
-          </span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+          <span>FINAL</span>
+          {(c.periodType === 'OT' || c.periodType === 'SO') && (
+            <>
+              <span>•</span>
+              <span className="highlight">{c.periodType}</span>
+            </>
+          )}
+        </span>
         );
 
       default:
@@ -433,13 +380,16 @@ const GameStatistics = ({ game, strength }) => {
   };
 
   const shotsArr = game.shots?.shots || [];
+  const getOpponent = (teamAbbrev) => {
+    return teamAbbrev === game.home.abbrev ? game.away.abbrev : game.home.abbrev;
+  };
 
   // Loop through the fetched shots and organize them by team, then type.
   const sorted = {};
   let shootout = false;
   let shootoutWinner = "";
   shotsArr.forEach((s) => {
-    const team = s.eventOwnerTeam;
+    let team = s.eventOwnerTeam;
     const type = s.typeDescKey;
 
     // Do not count shootout goals as goals.
@@ -449,6 +399,10 @@ const GameStatistics = ({ game, strength }) => {
         shootoutWinner = team;
       }
       return; 
+    }
+
+    if (type === 'blocked-shot') {
+      team = getOpponent(team);
     }
 
     // Create an empty object for a team if it doesn't exist.
@@ -513,7 +467,7 @@ const GameStatistics = ({ game, strength }) => {
       {/* Rink and Toggles */}
       <div className='rinkcard'>
         <h2 className='gameHeader'>Shotmap • <i>Last Updated: {time}</i></h2>
-        <div style={{textAlign: 'center', margin: '4px'}}>
+        <div style={{textAlign: 'center', margin: '4px 4px 0 4px'}}>
           <i>Data reflects plays made under the <b>{strength.toUpperCase()}</b> strength state.</i>
         </div>
         <div className='filter-row'>
@@ -521,7 +475,7 @@ const GameStatistics = ({ game, strength }) => {
             <ToggleMenu key={category} category={category} options={options} selected={filters[category]} onToggle={(v) => toggleFilter(category, v)} />
           ))}
         </div>    
-        <div style={{display: 'flex', flexDirection: 'row', gap: '20px', justifyContent: 'center', margin: '10px'}}>
+        <div style={{display: 'flex', flexDirection: 'row', gap: '20px', justifyContent: 'center', margin: '4px 10px'}}>
           <div style={{display: 'flex', alignItems: 'center'}}>
             <p style={{ margin: '0 8px 0 0' }}>Goal</p>
             <svg width="25" height="25" viewBox="0 0 100 100" style={{ overflow: 'visible' }}>
@@ -550,7 +504,7 @@ const GameStatistics = ({ game, strength }) => {
             </svg>
           </div>
         </div>
-        <SVGRink key={game.id} arr={filteredShots} gameid={game.id} home={game.home} away={game.away} strength={strength} />
+        <SVGRink key={game.id} arr={filteredShots} gameid={game.id} home={game.home} away={game.away} strength={strength} def={game.homeTeamDefendingSide} />
       </div>
 
       {/* Statistics Table */}
@@ -622,7 +576,7 @@ const GameStatistics = ({ game, strength }) => {
 }
 
 function App({ pageId }) {
-  const [date, setDate] = useState(new Date(2026, 3, 7));
+  const [date, setDate] = useState(new Date());
   const [showCalendar, setShowCalendar] = useState(false);
 
   const dateChange = (newDate) => {

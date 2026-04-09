@@ -8,14 +8,17 @@ import { TEAM_COLOURS } from '../constants/colours';
  * @param {Object} home contains the data belonging to the home team for this game.
  * @param {Object} away contains the data belonging to the away team for this game.
  * @param {String} strength representation of the strength state chosen by the user.
+ * @param {String} def 
  * @returns  {JSX.Element} SVG representation of a hockey rink.
  */
-const SVGRink = ( {arr, gameid, home, away, strength} ) => {
+const SVGRink = ( {arr, gameid, home, away, strength, def} ) => {
   const [selectedShot, setSelectedShot] = useState(null);
   const [infoPos, setInfoPos] = useState({ x: 0, y: 0 });
 
   const homeLogoUrl = `https://assets.nhle.com/logos/nhl/svg/${home.abbrev}_light.svg`;
   const awayLogoUrl = `https://assets.nhle.com/logos/nhl/svg/${away.abbrev}_light.svg`;
+  const leftPos = { x: "-1", y: "36", width: "13", height: "13", opacity: "0.6" };
+  const rightPos = { x: "188", y: "36", width: "13", height: "13", opacity: "0.6" };
 
   // Handle displaying the info card when clicking on a shot.
   const handleClick = (e, shot) => {
@@ -72,8 +75,17 @@ const SVGRink = ( {arr, gameid, home, away, strength} ) => {
         <circle cx="117.5" cy="63.75" r="0.5" stroke="rgb(200, 16, 46)" />
 
         {/* Team Logos */}
-        <image href={homeLogoUrl} x="27" y="26.5" width="32" height="32" opacity="0.33" />
-        <image href={awayLogoUrl} x="141" y="26.5" width="32" height="32" opacity="0.33" />
+        {def === 'right' ? (
+          <>
+            <image href={homeLogoUrl} {...leftPos} />
+            <image href={awayLogoUrl} {...rightPos} />
+          </>
+        ) : (
+          <>
+            <image href={homeLogoUrl} {...rightPos} />
+            <image href={awayLogoUrl} {...leftPos} />
+          </>
+        )}
 
         {/* End Zone Faceoff Circles */}
         <circle cx="35" cy="21.25" r="12.5" fill="none" stroke="rgb(200, 16, 46)" strokeWidth="0.33" />
@@ -92,25 +104,39 @@ const SVGRink = ( {arr, gameid, home, away, strength} ) => {
         <path d="M 189 36.5 A 6 6 0 0 0 189 48.5" fill="rgba(0, 150, 255, 0.2)" stroke="rgb(200, 16, 46)" strokeWidth="0.33" />
 
         {/* Shot Mapping */}
-        <g clipPath="url(#rinkClip)">
-          {Array.from(new Set(arr.map(s => s.id))).map(id => {
-            const s = arr.find(shot => shot.id === id);
-    
-            // Handle mirroring the shots during P2 and OT (P4).
-            const displayCoords = s.period.number % 2 === 0 
-              ? { x: s.coords.xCoord * -1, y: s.coords.yCoord * -1 }
-              : { x: s.coords.xCoord, y: s.coords.yCoord };
+        {/* Shot Mapping */}
+<g clipPath="url(#rinkClip)">
+  {Array.from(new Set(arr.map(s => s.id))).map(id => {
+    const s = arr.find(shot => shot.id === id);
+    const isHomeTeam = s.eventOwnerTeam === home.abbrev;
 
-            return (
-              <Shot 
-                key={`${gameid}-${id}-${s.typeDescKey}`} 
-                shot={{ ...s, coords: { ...s.coords, xCoord: displayCoords.x, yCoord: displayCoords.y } }}
-                selected={selectedShot?.id === s.id} 
-                onClick={(e) => handleClick(e, s)} 
-              />
-            );
-          })}
-        </g>
+    // Determine if home is currently attacking the right side.
+    const homeStartsDefendingRight = def === 'right';
+    const evenPeriod = s.period.number % 2 === 0;
+    const homeAttackingRight = homeStartsDefendingRight ? evenPeriod : !evenPeriod;
+    const teamAttackingNow = isHomeTeam ? homeAttackingRight : !homeAttackingRight;
+
+    let finalX = s.coords.xCoord;
+    let finalY = s.coords.yCoord;
+    if (!teamAttackingNow) {
+      finalX *= -1;
+      finalY *= -1;
+    }
+    if (!isHomeTeam) {
+      finalX *= -1;
+      finalY *= -1;
+    }
+
+    return (
+      <Shot 
+        key={`${gameid}-${id}-${s.typeDescKey}`} 
+        shot={{ ...s, coords: { ...s.coords, xCoord: finalX, yCoord: finalY } }}
+        selected={selectedShot?.id === s.id} 
+        onClick={(e) => handleClick(e, s)} 
+      />
+    );
+  })}
+</g>
 
         {/* Cover for any clipping lines */}
         <rect x="0" y="0" width="200" height="85" rx="15" fill="none" stroke="black" strokeWidth="0.33" />
