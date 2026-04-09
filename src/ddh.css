@@ -520,3 +520,24 @@
   gap: 8px !important; 
   white-space: nowrap !important; 
 }
+
+@media (max-width: 750px) {
+  #ddh-app-root .legend {
+    display: grid !important; 
+    grid-template-columns: 1fr 1fr !important; 
+    gap: 12px 15px !important;
+    max-width: 350px !important;
+    margin: 10px auto !important;
+  }
+
+  #ddh-app-root .legend-item {
+    display: grid !important; 
+    grid-template-columns: 1fr 30px !important; 
+    text-align: left !important;
+    gap: 8px !important;
+  }
+  
+  #ddh-app-root .legend-item p {
+    margin: 0 !important;
+  }
+}
