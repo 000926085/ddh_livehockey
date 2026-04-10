@@ -190,7 +190,7 @@ const GameStatistics = ({ game, strength }) => {
             </i>
           </h2>
         </div>
-        <div style={{textAlign: 'center'}}>
+        <div style={{textAlign: 'center', margin: '4px'}}>
           <i>Data reflects plays made under the <b>{strength.toUpperCase()}</b> strength state.</i>
         </div>
         <div className='filter-row'>

@@ -427,9 +427,8 @@
   display: flex !important;
   flex-direction: row !important;
   align-items: center !important;
-  justify-content: center !important;
+  justify-content: space-between !important;
   width: 100% !important;
-  padding: 5px 0 10px 0 !important;
 }
 
 #ddh-app-root .teamC {
@@ -438,6 +437,8 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
+  justify-content: flex-start;
+  min-width: 0;
 }
 
 #ddh-app-root .scoreDisplay {
@@ -451,8 +452,11 @@
 }
 
 #ddh-app-root .teamDisplay {
-  font-size: 1.8rem !important;
+  font-size: 1.4rem !important;
   font-weight: 600 !important;
+  margin-top: 5px !important;
+  width: 100%;
+  overflow-wrap: break-word;
 }
 
 #ddh-app-root .teamLogo {
@@ -535,18 +539,18 @@
 
 @media (max-width: 750px) {
   #ddh-app-root .legend {
-    display: grid !important; 
-    grid-template-columns: 1fr 1fr !important; 
-    gap: 12px 15px !important;
-    max-width: 350px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important; 
+    max-width: 200px !important; 
     margin: 10px auto !important;
+    gap: 8px !important;
   }
 
   #ddh-app-root .legend-item {
-    display: grid !important; 
-    grid-template-columns: 1fr 30px !important; 
-    text-align: left !important;
-    gap: 8px !important;
+    display: flex !important; 
+    justify-content: space-between !important;
+    width: 100% !important;
   }
   
   #ddh-app-root .legend-item p {
