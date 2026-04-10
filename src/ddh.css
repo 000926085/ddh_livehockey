@@ -538,19 +538,3 @@
   align-items: center !important;
   justify-content: center !important;
 }
-
-#ddh-app-root .legend { 
-  display: flex !important; 
-  flex-direction: row !important;
-  flex-wrap: wrap !important; 
-  gap: 20px !important;
-  justify-content: center !important;
-  margin: 4px 10px !important;
-}
-
-#ddh-app-root .legend-item {
-  display: flex !important; 
-  align-items: center !important; 
-  gap: 8px !important; 
-  white-space: nowrap !important; 
-}
