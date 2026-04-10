@@ -192,8 +192,6 @@ const GameStatistics = ({ game, strength }) => {
         </div>
         <div style={{textAlign: 'center', margin: '4px'}}>
           <i>Data reflects plays made under the <b>{strength.toUpperCase()}</b> strength state.</i>
-           <p>testing</p>
-          <p>testing</p>
         </div>
         <div className='filter-row'>
           {Object.entries(dropdownOptions).map(([category, options]) => (
