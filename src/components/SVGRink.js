@@ -8,8 +8,8 @@ import { TEAM_COLOURS } from '../constants/colours';
  * @param {Object} home contains the data belonging to the home team for this game.
  * @param {Object} away contains the data belonging to the away team for this game.
  * @param {String} strength representation of the strength state chosen by the user.
- * @param {String} def 
- * @returns  {JSX.Element} SVG representation of a hockey rink.
+ * @param {String} def indicates which side the home team initially defends from.
+ * @returns {JSX.Element} SVG representation of a hockey rink.
  */
 const SVGRink = ( {arr, gameid, home, away, strength, def} ) => {
   const [selectedShot, setSelectedShot] = useState(null);
@@ -50,6 +50,16 @@ const SVGRink = ( {arr, gameid, home, away, strength, def} ) => {
           <clipPath id="rinkClip">
             <rect x="-2" y="-2" width="204" height="89" rx="15" ry="15" />
           </clipPath>
+          <g id="hashes">
+            <path d="M -7, -0.75 H -2.5 V -3" fill="none" stroke="rgb(200, 16, 46)" strokeWidth="0.33" />
+            <path d="M 7, -0.75 H 2.5 V -3" fill="none" stroke="rgb(200, 16, 46)" strokeWidth="0.33" />
+            <path d="M -7, 0.75 H -2.5 V 3" fill="none" stroke="rgb(200, 16, 46)" strokeWidth="0.33" />
+            <path d="M 7, 0.75 H 2.5 V 3" fill="none" stroke="rgb(200, 16, 46)" strokeWidth="0.33" />
+            <line x1="2.5" y1="12.25" x2="2.5" y2="14.25" stroke="rgb(200, 16, 46)" strokeWidth="0.33" />
+            <line x1="-2.5" y1="12.25" x2="-2.5" y2="14.25" stroke="rgb(200, 16, 46)" strokeWidth="0.33" />
+            <line x1="2.5" y1="-12.25" x2="2.5" y2="-14.25" stroke="rgb(200, 16, 46)" strokeWidth="0.33" />
+            <line x1="-2.5" y1="-12.25" x2="-2.5" y2="-14.25" stroke="rgb(200, 16, 46)" strokeWidth="0.33" />
+          </g>
         </defs>
 
         {/* Rink Boundary */}
@@ -77,13 +87,13 @@ const SVGRink = ( {arr, gameid, home, away, strength, def} ) => {
         {/* Team Logos */}
         {def === 'right' ? (
           <>
-            <image href={homeLogoUrl} {...leftPos} />
-            <image href={awayLogoUrl} {...rightPos} />
+            <image href={homeLogoUrl} {...rightPos} />
+            <image href={awayLogoUrl} {...leftPos} />
           </>
         ) : (
           <>
-            <image href={homeLogoUrl} {...rightPos} />
-            <image href={awayLogoUrl} {...leftPos} />
+            <image href={homeLogoUrl} {...leftPos} />
+            <image href={awayLogoUrl} {...rightPos} />
           </>
         )}
 
@@ -97,12 +107,17 @@ const SVGRink = ( {arr, gameid, home, away, strength, def} ) => {
         <circle cx="165" cy="63.75" r="12.5" fill="none" stroke="rgb(200, 16, 46)" strokeWidth="0.33" />
         <circle cx="165" cy="63.75" r="0.5" stroke="rgb(200, 16, 46)" />
 
+        {/* Faceoff Hashes */}
+        <use href="#hashes" x="35" y="21.25" />
+        <use href="#hashes" x="35" y="63.75" />
+        <use href="#hashes" x="165" y="21.25" />
+        <use href="#hashes" x="165" y="63.75" />
+
         {/* Referee and Goal Creases */}
         <path d="M 90 0 A 10 10 0 0 0 110 0" fill="none" stroke="rgb(200, 16, 46)" strokeWidth="0.33" />
         <path d="M 90 85 A 10 10 0 0 1 110 85" fill="none" stroke="rgb(200, 16, 46)" strokeWidth="0.33" />
         <path d="M 11 36.5 A 6 6 0 0 1 11 48.5" fill="rgba(0, 150, 255, 0.2)" stroke="rgb(200, 16, 46)" strokeWidth="0.33" />
         <path d="M 189 36.5 A 6 6 0 0 0 189 48.5" fill="rgba(0, 150, 255, 0.2)" stroke="rgb(200, 16, 46)" strokeWidth="0.33" />
-
         
         {/* Shot Mapping */}
         <g clipPath="url(#rinkClip)">
@@ -110,21 +125,16 @@ const SVGRink = ( {arr, gameid, home, away, strength, def} ) => {
             const s = arr.find(shot => shot.id === id);
             const isHomeTeam = s.eventOwnerTeam === home.abbrev;
 
-            // Determine if home is currently attacking the right side.
-            const homeStartsDefendingRight = def === 'right';
-            const evenPeriod = s.period.number % 2 === 0;
-            const homeAttackingRight = homeStartsDefendingRight ? evenPeriod : !evenPeriod;
-            const teamAttackingNow = isHomeTeam ? homeAttackingRight : !homeAttackingRight;
+            const homeAttacksRight = (def === 'left');
+            const targetSideRight = isHomeTeam ? homeAttacksRight : !homeAttacksRight;
 
             let finalX = s.coords.xCoord;
             let finalY = s.coords.yCoord;
-            if (!teamAttackingNow) {
-              finalX *= -1;
-              finalY *= -1;
-            }
-            if (!isHomeTeam) {
-              finalX *= -1;
-              finalY *= -1;
+            const isRawXRight = s.coords.xCoord > 0;
+            
+            if (isRawXRight !== targetSideRight) {
+                finalX *= -1;
+                finalY *= -1;
             }
 
             return (
@@ -220,13 +230,25 @@ const ShotDetails = ({ shot, pos, onClose }) => {
     };
   }, [onClose]);
 
+  // Display the period and time remaining within the period.
+  const p_timeDisplay = shot.period.number > 3
+    ? shot.period.number <= 4
+      ? `OT · ${shot.period.timeRemaining}`
+      : 'SO'
+    : `P${shot.period.number} · ${shot.period.timeRemaining}`
+
+  let assistString = "";
+  if (shot.assists) {
+    assistString = Object.values(shot.assists).filter(Boolean).join(", ");
+  }
+
   return (
     <div ref={cardRef} className="shot-details" 
       style={{ 
         left: `${pos.x}%`, 
         top: `${pos.y}%`,
         transform: pos.x > 50 ? 'translate(-100%, -50%)' : 'translate(0, -50%)',
-        marginLeft: pos.x > 50 ? '-10px' : '10px',
+        marginLeft: pos.x > 50 ? '-15px' : '15px',
       }}>
       <div style={{ display: 'grid', gridTemplateColumns: 'clamp(30px, 4vw, 60px) 1fr',  gap: 'clamp(6px, 1.5vw, 12px)', alignItems: 'center' }}>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -242,9 +264,15 @@ const ShotDetails = ({ shot, pos, onClose }) => {
             {shot.player.shootingPlayer}
           </span>
 
+          {assistString && (
+            <span style={{ fontSize: 'clamp(10px, 1vw, 14px)', opacity: 0.85, fontStyle: 'italic', color: '#d1e3ff' }}>
+              {assistString}
+            </span>
+          )}
+
           {/* Metadata: Scales between 10px and 13px */}
           <span style={{ fontSize: 'clamp(10px, 1vw, 13px)', opacity: 0.8, marginTop: '2px' }}>
-            P{shot.period.number} · {shot.period.timeRemaining} · {shot.strengthState}
+            {p_timeDisplay} · {shot.strengthState}
           </span>
         </div>
       </div>
