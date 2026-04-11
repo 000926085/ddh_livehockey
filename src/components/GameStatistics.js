@@ -167,15 +167,27 @@ const GameStatistics = ({ game, strength }) => {
     return acc;
   }, {});
 
-  // Timestamp of when a game was last updated.
-  const time = game.lastUpdated?.seconds 
-  ? new Date(game.lastUpdated.seconds * 1000).toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      timeZoneName: 'short'
-    })
-  : 'Loading...';
+  const time = (() => {
+    // Fallback for older implementation.
+    if (game.lastUpdated.seconds) {
+      return new Date(game.lastUpdated.seconds * 1000).toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        timeZoneName: 'short'
+      });
+    }
+
+    const date = new Date(game.lastUpdated);
+    return !isNaN(date) 
+    ? date.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        timeZoneName: 'short'
+      })
+    : 'Invalid Date';
+  })();
 
   // Common stylings.
   const common = {
