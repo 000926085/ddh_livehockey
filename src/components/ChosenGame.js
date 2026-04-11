@@ -1,62 +1,11 @@
+import { gameStatus } from "./GameCard";
+
 /**
  * Constructs a larger representation of a game to indicate its selection.
- * @param {*} game - the game selected by the user.
- * @returns div containing data of the selected game.
+ * @param {Object} game the game selected by the user.
+ * @returns {JSX.Element} large card representation of the user's chosen game.
  */
 const ChosenGame = ({ game }) => {
-// Determine how to fill the header text.
-  const gameStatus = (c) => {
-    switch (c.gameState) {
-      case 'FUT':
-      case 'PRE':
-        return (
-          <span className='highlight' style={{fontSize: '1.5rem', fontWeight: 'bold'}}>
-            {new Date(game.startTimeUTC).toLocaleTimeString('en-US', {
-              hour: 'numeric',
-              minute: '2-digit',
-              second: '2-digit',
-              hour12: true,
-              timeZoneName: 'short' 
-            })}
-          </span>
-        );
-
-      case 'LIVE':
-      case 'CRIT':
-      return <div style={{fontSize: '1.5rem', fontWeight: 'bold'}}>
-              <span className='highlight'>
-                {game.period <= 3 ? `P${game.period}` : 'OT'}
-              </span>
-              {" "}
-              <span>
-                {game.inIntermission 
-                  ? 'END' 
-                  : game.timeRemaining
-                }
-              </span>
-            </div>
-
-      case 'FINAL':
-      case 'OFF':
-        return (
-          <div style={{fontSize: '1.5rem', fontWeight: 'bold'}}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-            <span>FINAL</span>
-            {(c.periodType === 'OT' || c.periodType === 'SO') && (
-              <>
-                <span>•</span>
-                <span className="highlight">{c.periodType}</span>
-              </>
-            )}
-            </span>
-          </div>
-        );
-
-      default:
-        return <span></span>;
-    }
-  };
-
   return (
     <div className='selectedContainer'>
       <div className='selectedGame'>

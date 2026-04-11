@@ -15,6 +15,7 @@ const SVGRink = ( {arr, gameid, home, away, strength, def} ) => {
   const [selectedShot, setSelectedShot] = useState(null);
   const [infoPos, setInfoPos] = useState({ x: 0, y: 0 });
 
+  // Define the team logos and their positions.
   const homeLogoUrl = `https://assets.nhle.com/logos/nhl/svg/${home.abbrev}_light.svg`;
   const awayLogoUrl = `https://assets.nhle.com/logos/nhl/svg/${away.abbrev}_light.svg`;
   const leftPos = { x: "-1", y: "36", width: "13", height: "13", opacity: "0.6" };
@@ -124,7 +125,6 @@ const SVGRink = ( {arr, gameid, home, away, strength, def} ) => {
           {Array.from(new Set(arr.map(s => s.id))).map(id => {
             const s = arr.find(shot => shot.id === id);
             const isHomeTeam = s.eventOwnerTeam === home.abbrev;
-
             const homeAttacksRight = (def === 'left');
             const targetSideRight = isHomeTeam ? homeAttacksRight : !homeAttacksRight;
 
@@ -171,9 +171,9 @@ const Shot = ( {shot, selected, onClick} ) => {
   // Define common properties for a shot. 
   const common = {
     key: shot.id,
-    fill: TEAM_COLOURS[shot.eventOwnerTeam]?.primary ?? "#FFD700",
+    fill: TEAM_COLOURS[shot.eventOwnerTeam]?.primary ?? "#222",
     fillOpacity: selected ? 1 : 0.75,
-    stroke: selected ? 'rgba(235, 235, 235, 0.76)' : (TEAM_COLOURS[shot.eventOwnerTeam]?.primary ?? "#FFD700"),
+    stroke: selected ? 'rgba(235, 235, 235, 0.76)' : (TEAM_COLOURS[shot.eventOwnerTeam]?.primary ?? "#707070"),
     strokeWidth: 0.2,
     style: { cursor: "pointer" },
     onClick: (e) => onClick(e)
@@ -251,26 +251,30 @@ const ShotDetails = ({ shot, pos, onClose }) => {
         marginLeft: pos.x > 50 ? '-15px' : '15px',
       }}>
       <div style={{ display: 'grid', gridTemplateColumns: 'clamp(30px, 4vw, 60px) 1fr',  gap: 'clamp(6px, 1.5vw, 12px)', alignItems: 'center' }}>
+        {/* Team Logo */}
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <img src={`https://assets.nhle.com/logos/nhl/svg/${shot.eventOwnerTeam}_light.svg`} alt="Logo" style={{ width: '100%', height: 'auto' }} />
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0px' }}>
+          {/* Shooting Team */}
           <span style={{ fontSize: 'clamp(9px, 0.9vw, 11px)', fontWeight: 'bold', textTransform: 'uppercase', opacity: 0.9 }}>
             {shot.eventOwnerTeam} {shotType}
           </span>
 
+          {/* Shooting Player */}
           <span style={{ fontSize: 'clamp(12px, 1.5vw, 18px)', fontWeight: '700', lineHeight: '1.1' }}>
             {shot.player.shootingPlayer}
           </span>
 
+          {/* Assists, if applicable */}
           {assistString && (
             <span style={{ fontSize: 'clamp(10px, 1vw, 14px)', opacity: 0.85, fontStyle: 'italic', color: '#d1e3ff' }}>
               {assistString}
             </span>
           )}
 
-          {/* Metadata: Scales between 10px and 13px */}
+          {/* Metadata */}
           <span style={{ fontSize: 'clamp(10px, 1vw, 13px)', opacity: 0.8, marginTop: '2px' }}>
             {p_timeDisplay} · {shot.strengthState}
           </span>

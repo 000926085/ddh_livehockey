@@ -7,9 +7,10 @@ import { TEAM_COLOURS } from '../constants/colours.js';
 import { filterShots } from '../utils/gameHelpers.js';
 
 /**
- * 
- * @param {object} game represents a game, along with its data and shot data.
- * @returns table containing a tally of the shots, sorted by type, for each team.
+ * Constructs the rink and game statistics table for a given game.
+ * @param {Object} game represents a game, along with its data and shot data.
+ * @param {String} strength currently selected strength state.
+ * @returns {JSX.Element} table containing a tally of the shots, sorted by type, for each team.
  */
 const GameStatistics = ({ game, strength }) => {
   // Stores the currently selected filters.
@@ -69,6 +70,7 @@ const GameStatistics = ({ game, strength }) => {
         ...game.away.players.map(p => p.player)
       ];
       
+      // Default filters upon selecting a game.
       setFilters({
         shotType: ['goal', 'shot-on-goal', 'missed-shot', 'blocked-shot'],
         period: [1, 2, 3, 4], 
@@ -84,7 +86,7 @@ const GameStatistics = ({ game, strength }) => {
   // Helper function to generalize the toggling functionality for dropdown menus.
   const toggleFilter = (category, value) => {
     setFilters(prev => {
-      // Select All
+      // Select All.
       if (Array.isArray(value)) {
         return {
           ...prev,
@@ -108,6 +110,7 @@ const GameStatistics = ({ game, strength }) => {
   const shotsArr = game.shots?.shots || [];
   const filteredShots = filterShots(shotsArr, strength, filters, game.home.abbrev);
 
+  // Function for finding the abbreviation of the opposing team
   const getOpponent = (teamAbbrev) => {
     return teamAbbrev === game.home.abbrev ? game.away.abbrev : game.home.abbrev;
   };
@@ -117,6 +120,7 @@ const GameStatistics = ({ game, strength }) => {
     [game.away.abbrev]: {}
   };
 
+  // Required for unique shootout behavour.
   let shootout = false;
   let shootoutWinner = "";
 
@@ -134,6 +138,7 @@ const GameStatistics = ({ game, strength }) => {
       return; 
     }
 
+    // Blocked shots are attributed to the opposing team. 
     if (type === 'blocked-shot') {
       team = getOpponent(team);
     }
@@ -162,6 +167,7 @@ const GameStatistics = ({ game, strength }) => {
     return acc;
   }, {});
 
+  // Timestamp of when a game was last updated.
   const time = game.lastUpdated?.seconds 
   ? new Date(game.lastUpdated.seconds * 1000).toLocaleTimeString('en-US', {
       hour: '2-digit',
@@ -171,6 +177,7 @@ const GameStatistics = ({ game, strength }) => {
     })
   : 'Loading...';
 
+  // Common stylings.
   const common = {
     fill: "#0c1f99",
     fillOpacity: 0.75,
@@ -193,11 +200,15 @@ const GameStatistics = ({ game, strength }) => {
         <div style={{textAlign: 'center', margin: '4px'}}>
           <i>Data reflects plays made under the <b>{strength.toUpperCase()}</b> strength state.</i>
         </div>
+
+        {/* Filters */}
         <div className='filter-row'>
           {Object.entries(dropdownOptions).map(([category, options]) => (
             <ToggleMenu key={category} category={category} options={options} selected={filters[category]} onToggle={(v) => toggleFilter(category, v)} />
           ))}
-        </div>    
+        </div>
+
+        {/* Legend to demonstrate the shot types. */}    
         <div className='legend'>
           <div className='legend-item'>
             <p style={{ margin: '0 8px 0 0' }}>Goal</p>
@@ -227,6 +238,8 @@ const GameStatistics = ({ game, strength }) => {
             </svg>
           </div>
         </div>
+
+        {/* Hockey Rink */}
         <SVGRink key={game.id} arr={filteredShots} gameid={game.id} home={game.home} away={game.away} strength={strength} def={game.homeTeamDefendingSide} />
       </div>
 
@@ -260,6 +273,7 @@ const GameStatistics = ({ game, strength }) => {
             </div>
           </div>
 
+          {/* Statistics Table */}
           {stats.map((stat) => {
             const homeVal = statsLookup[stat.key].home;
             const awayVal = statsLookup[stat.key].away;
@@ -267,7 +281,9 @@ const GameStatistics = ({ game, strength }) => {
             const showSO = goalRow && sorted.isShootoutGame;
 
             const homeStyles = {
-              backgroundColor: homeVal > awayVal ? TEAM_COLOURS[game.home.abbrev].primary : '#222',
+              backgroundColor: homeVal > awayVal 
+                ? (TEAM_COLOURS[game.home.abbrev]?.primary || '#707070') 
+                : '#222',
               backgroundImage: homeVal > awayVal 
                 ? 'linear-gradient(to bottom, rgba(255,255,255,0.2), rgba(255,255,255,0))' 
                 : 'none',
@@ -275,7 +291,9 @@ const GameStatistics = ({ game, strength }) => {
             };
 
             const awayStyles = {
-              backgroundColor: awayVal > homeVal ? TEAM_COLOURS[game.away.abbrev].primary : '#222',
+              backgroundColor: awayVal > homeVal 
+                ? (TEAM_COLOURS[game.away.abbrev]?.primary || '#707070') 
+                : '#222',
               backgroundImage: awayVal > homeVal 
                 ? 'linear-gradient(to bottom, rgba(255,255,255,0.2), rgba(255,255,255,0))' 
                 : 'none',
@@ -284,9 +302,11 @@ const GameStatistics = ({ game, strength }) => {
 
             return (
               <div key={stat.key} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center',  margin: '5px 0' }}>
-                {showSO && homeVal > awayVal && (
-                  <span style={{ fontSize: '0.6rem', verticalAlign: 'middle', marginLeft: '4px' }}>(SO)</span>
-                )}
+                <div style={{ position: 'relative' }}>
+                  {showSO && homeVal > awayVal && (
+                    <span style={{ position: 'absolute', left: '-45px', top: '50%', transform: 'translateY(-50%)', fontSize: '1.0rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>(SO)</span>
+                  )}
+                </div>
                 <div className='stats-card' style={homeStyles}>
                   <p>{homeVal}</p>
                 </div>
@@ -294,9 +314,11 @@ const GameStatistics = ({ game, strength }) => {
                 <div className='stats-card' style={awayStyles}>
                   <p>{awayVal}</p>
                 </div>
-                {showSO && awayVal > homeVal && (
-                  <span style={{ fontSize: '0.6rem', verticalAlign: 'middle', marginLeft: '4px' }}>(SO)</span>
-                )}
+                <div style={{ position: 'relative' }}>
+                  {showSO && awayVal > homeVal && (
+                    <span style={{ position: 'absolute', right: '-45px', top: '50%', transform: 'translateY(-50%)', fontSize: '1.0rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>(SO)</span>
+                  )}
+                </div>
               </div>
             );
           })}
