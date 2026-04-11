@@ -11,7 +11,7 @@ const root = ReactDOM.createRoot(rootElement);
 
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename="/nhl-live-tracker">
       <App pageId={pageId} />
     </BrowserRouter>
   </React.StrictMode>
