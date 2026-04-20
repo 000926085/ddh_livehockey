@@ -60,6 +60,7 @@ const GameStatistics = ({ game, strength }) => {
     { label: 'Shots-On-Goal', key: 'shot-on-goal' },
     { label: 'Blocked Shots', key: 'blocked-shot' },
     { label: 'Missed Shots', key: 'missed-shot' },
+    { label: 'Penalty Minutes', key: 'penaltyMinutes'}
   ];
 
   // Handles setting a new roster once another game is selected.
@@ -158,7 +159,17 @@ const GameStatistics = ({ game, strength }) => {
   }
 
   // Get the amount of shots of a given type if it exists, 0 if it does not.
-  const getCount = (abbrev, type) => sorted[abbrev]?.[type] || 0;
+  const getCount = (abbrev, type) => {
+    // Check if we're looking for penaltyMinutes instead.
+    if (type === 'penaltyMinutes') {
+      return abbrev === game.home.abbrev 
+        ? game.home.penaltyMinutes 
+        : game.away.penaltyMinutes;
+    }
+    
+    return sorted[abbrev]?.[type] || 0;
+  };
+
   const statsLookup = stats.reduce((acc, stat) => {
     acc[stat.key] = {
       home: getCount(game.home.abbrev, stat.key),

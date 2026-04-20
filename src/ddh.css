@@ -347,9 +347,10 @@
   min-width: 150px;
   font-family: sans-serif;
   width: max-content;
-  max-width: 40vw;
+  max-width: 60vw;
   padding: clamp(6px, 1vw, 12px);
-  white-space: nowrap;
+  white-space: normal;
+  word-wrap: break-word;
 }
 
 .shot-information {
