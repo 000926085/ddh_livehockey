@@ -54,8 +54,8 @@ export const filterShots = (shots, strength, categories, home) => {
         if (strength === 'EV' && s.strengthState !== 'EVEN') return false;
         if (strength === 'ALL w/o ENG') {
             const opponentNetEmpty = (s.eventOwnerTeam === home) 
-                ? s.strengthState.includes("AWAY NET EMPTY") 
-                : s.strengthState.includes("HOME NET EMPTY");
+                ? s.strengthState?.includes("AWAY NET EMPTY") || s.strengthState?.includes("AWAY EMPTY NET")
+                : s.strengthState?.includes("HOME NET EMPTY") || s.strengthState?.includes("HOME EMPTY NET");
 
             if (opponentNetEmpty && s.typeDescKey === 'goal') {
                 return false;
