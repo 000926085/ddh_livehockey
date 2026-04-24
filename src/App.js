@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
 
 import './index.css';
 import './ddh.css';
+import './calendar.css';
 
 import ChosenGame from './components/ChosenGame.js';
 import GameCard from './components/GameCard.js';
