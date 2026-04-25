@@ -8,15 +8,10 @@ const StrengthToggle = ({active, onChange}) => {
   const btns = ['ALL', 'EV', 'ALL w/o ENG'];
 
   return (
-    <div style={{display: 'flex', flexDirection: 'row',  flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center',  gap: '12px', padding: '10px 0', width: '100%' }}>
-      <h1 className='title' style={{ margin: 0, fontSize: '1.6rem',}}>
-        Strength State
-      </h1>
-
-      {/* Button Group */}
-      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }}>
+    <div className="filter-wrapper">
+      <div className="panel">
         {btns.map((b) => (
-          <button key={b} className={`item ${b === active ? 'btn_on' : 'btn_off'} btn`} onClick={() => onChange(b)}>
+          <button key={b} className={`segment ${active === b ? 'active' : ''}`} onClick={() => onChange(b)}>
             {b}
           </button>
         ))}
