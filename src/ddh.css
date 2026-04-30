@@ -209,7 +209,8 @@
 
 .stats-card {
   padding: 6px;
-  width: 50px;
+  width: 60px;
+  min-width: 60px;
   text-align: center;
   border-radius: 8px;
   padding: 0 10px;
@@ -218,9 +219,10 @@
 
 .stat-label {
   font-size: clamp(0.8rem, 2vw, 0.9rem);
+  min-width: 100px;
   width: 150px;
   text-align: center;
-  margin: 0 20px;
+  margin: 0 10px;
   text-transform: uppercase;
   letter-spacing: 1px;
   font-weight: 600;
@@ -520,9 +522,6 @@
   font-size: 16px !important;
   line-height: 1.2 !important;
   box-sizing: border-box;
-}
-
-#ddh-app-root {
   color: white !important;
   font-family: Arial, sans-serif !important;
 }
