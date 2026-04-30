@@ -368,7 +368,7 @@ const GameStatistics = ({ game, strength }) => {
             };
 
             return (
-              <div key={stat.key} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center',  margin: '5px 0' }}>
+              <div key={stat.key} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',  margin: '5px 0', width: '80%' }}>
                 <div style={{ position: 'relative' }}>
                   {showSO && homeVal > awayVal && (
                     <span style={{ position: 'absolute', left: '-45px', top: '50%', transform: 'translateY(-50%)', fontSize: '1.0rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>(SO)</span>
