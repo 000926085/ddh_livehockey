@@ -5,9 +5,9 @@
  */
 export const sanitize = (game) => {
     const data = game?.gameData || {};
-    const shots = game?.shots || {};
+    const shots = game?.gameData?.shots || {};
     const g_id = game?.id || "";
-
+    
     return {
         id: g_id,
         gameDate: data.gameDate ?? '',

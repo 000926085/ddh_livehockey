@@ -53,12 +53,12 @@ const GameStatistics = ({ game, strength }) => {
     }))
   }
 
-  const maxPeriod = Math.max(...(game.shots?.shots.map(s => s.period?.number) || [3]));
+  const maxPeriod = Math.max(...(game.shots?.map(s => s.period?.number) || [3]));
 
   // Add the dropdown options for any periods past the initial three.
   if (maxPeriod >= 4) {
     for (let i = 4; i <= maxPeriod; i++) {
-      const isSO = game.shots?.shots.find(s => s.period?.number === i)?.period?.periodType === 'SO';
+      const isSO = game.shots?.find(s => s.period?.number === i)?.period?.periodType === 'SO';
 
       let label;
       if (isSO) { label = "SO"; }
@@ -91,10 +91,10 @@ const GameStatistics = ({ game, strength }) => {
       ];
 
       let defaultPeriods = [1, 2, 3];
-      const existingPeriods = [...new Set(game.shots?.shots.map(s => s.period?.number))];
+      const existingPeriods = [...new Set(game.shots?.map(s => s.period?.number))];
       existingPeriods.forEach(p => {
         if (p >= 4) {
-          const isSO = game.shots?.shots.find(s => s.period?.number === p)?.period?.periodType === 'SO';
+          const isSO = game.shots?.find(s => s.period?.number === p)?.period?.periodType === 'SO';
           if (!isSO) {
             defaultPeriods.push(p);
           }
@@ -138,7 +138,7 @@ const GameStatistics = ({ game, strength }) => {
     });
   };
 
-  const shotsArr = game.shots?.shots || [];
+  const shotsArr = game.shots || [];
   const filteredShots = filterShots(shotsArr, strength, filters, game.home.abbrev);
 
   // Function for finding the abbreviation of the opposing team
