@@ -368,26 +368,22 @@ const GameStatistics = ({ game, strength }) => {
             };
 
             return (
-              <div key={stat.key} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',  margin: '5px 0', width: '80%' }}>
-                <div style={{ position: 'relative' }}>
-                  {showSO && homeVal > awayVal && (
-                    <span style={{ position: 'absolute', left: '-45px', top: '50%', transform: 'translateY(-50%)', fontSize: '1.0rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>(SO)</span>
-                  )}
-                </div>
+            <div key={stat.key} className="stat-row">
+              <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', position: 'relative' }}>
+                {showSO && homeVal > awayVal && <span className="so-label" style={{ left: '-35px' }}>(SO)</span>}
                 <div className='stats-card' style={homeStyles}>
-                  <p>{homeVal}</p>
-                </div>
-                <p className='stat-label'>{stat.label}</p>
-                <div className='stats-card' style={awayStyles}>
-                  <p>{awayVal}</p>
-                </div>
-                <div style={{ position: 'relative' }}>
-                  {showSO && awayVal > homeVal && (
-                    <span style={{ position: 'absolute', right: '-45px', top: '50%', transform: 'translateY(-50%)', fontSize: '1.0rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>(SO)</span>
-                  )}
+                  <p style={{ margin: 0 }}>{homeVal}</p>
                 </div>
               </div>
-            );
+              <p className='stat-label'>{stat.label}</p>
+              <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start', position: 'relative' }}>
+                <div className='stats-card' style={awayStyles}>
+                  <p style={{ margin: 0 }}>{awayVal}</p>
+                </div>
+                {showSO && awayVal > homeVal && <span className="so-label" style={{ right: '-35px' }}>(SO)</span>}
+              </div>
+            </div>
+          );
           })}
       </div>
     </div>
