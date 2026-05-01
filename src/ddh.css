@@ -542,7 +542,7 @@
 
 .powerplay-icon {
   position: absolute;
-  top: -15px; 
+  top: -12.5px; 
   left: 50%;
   transform: translateX(-50%);
   background-color: #f21f1f;
@@ -642,8 +642,8 @@
 }
 
 #ddh-app-root .selectedGame .teamLogo {
-  width: 120px !important; 
-  height: 120px !important;
+  width: 110px !important; 
+  height: 110px !important;
 }
 
 #ddh-app-root .headerR {
