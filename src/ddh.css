@@ -641,6 +641,11 @@
   user-select: none;
 }
 
+#ddh-app-root .selectedGame .teamLogo {
+  width: 120px !important; 
+  height: 120px !important;
+}
+
 #ddh-app-root .headerR {
   display: flex !important;
   justify-content: center !important;

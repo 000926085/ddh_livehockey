@@ -24,7 +24,7 @@ const ChosenGame = ({ game }) => {
               {(gss === 'HOME PP') &&
                 <div className="powerplay-icon">PP</div>
               }
-              <img className='teamLogo' style={{height: '150px', width: '150px'}} src={`https://assets.nhle.com/logos/nhl/svg/${game.home.abbrev}_light.svg`} alt="Home Logo" />
+              <img className='teamLogo' src={`https://assets.nhle.com/logos/nhl/svg/${game.home.abbrev}_light.svg`} alt="Home Logo" />
             </div>
             <h2 className='teamDisplay'>{game.home.name}</h2>
           </div>
@@ -38,7 +38,7 @@ const ChosenGame = ({ game }) => {
               {(gss === 'AWAY PP') &&
                 <div className="powerplay-icon">PP</div>
               }
-              <img className='teamLogo' style={{height: '150px', width: '150px'}} src={`https://assets.nhle.com/logos/nhl/svg/${game.away.abbrev}_light.svg`} alt="Away Logo"/>
+              <img className='teamLogo' src={`https://assets.nhle.com/logos/nhl/svg/${game.away.abbrev}_light.svg`} alt="Away Logo"/>
             </div>
             <h2 className='teamDisplay'>{game.away.name}</h2>
           </div>
