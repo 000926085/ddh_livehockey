@@ -20,6 +20,7 @@ export const sanitize = (game) => {
         scheduled: data.scheduled ?? '',
         startTimeUTC: data.startTimeUTC ?? '',
         isShootoutGame: '',
+        globalStrengthState: data.strengthState ?? '',
         homeTeamDefendingSide: data.homeTeamDefendingSide ?? '',
         home: {
             name: data.teams?.home?.name ?? '',

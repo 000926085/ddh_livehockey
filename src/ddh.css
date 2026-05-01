@@ -131,6 +131,12 @@
   gap: 8px;
 }
 
+.logo-wrapper {
+  position: relative;
+  display: inline-flex; 
+  justify-content: center;
+}
+
 .teamLogo {
   width: 100px;
   height: 100px;
@@ -532,6 +538,22 @@
     font-size: 11px;
     padding: 10px 0;
   }
+}
+
+.powerplay-icon {
+  position: absolute;
+  top: -15px; 
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #f21f1f;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  padding: 4px 18px; 
+  border-radius: 24px;
+  z-index: 5;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  white-space: nowrap;
 }
 
 /* --- WordPress Overrides Begin Here! --- */
